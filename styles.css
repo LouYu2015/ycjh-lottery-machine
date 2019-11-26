@@ -229,6 +229,37 @@ input[type="textbox"]:focus {
 	background-color: rgba(255, 255, 255, 0.25);
 }
 
+/* ====== Text area ====== */
+
+textarea {
+	height: 20vw;
+	width: 100%;
+
+	margin: 1vw;
+
+	border: 0.15vw solid rgba(64, 64, 64, 0.25);
+	border-radius: 1vw;
+	outline: none;
+
+	background-color: rgba(255, 255, 255, 0);
+
+	font-size: 2vw;
+	text-align: center;
+
+	transition-property: border, box-shadow, background-color;
+	transition-duration: 0.5s;
+}
+
+textarea:hover {
+	border: 0.15vw solid rgba(32, 128, 255, 0.5);
+	transition-duration: 1s;
+}
+
+textarea:focus {
+	border: 0.15vw solid rgba(64, 64, 64, 0);
+	background-color: rgba(255, 255, 255, 0.25);
+}
+
 /* ====== Settings area ====== */
 
 #settings_interface

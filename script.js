@@ -22,13 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-var min_lottery_number = 1, max_lottery_number = 1000;
+function myConfirmation() {
+	return 'Are you sure you want to quit?';
+}
+
+window.onbeforeunload = myConfirmation;
+
+var mapping = [];
 var prompt_timeout = 2000;
 var dynamic_height_adjust_internal = 100;
 var number_of_lottery_numbers = 10;
 var current_lottery_numbers = [], history_lottery_numbers = [];
 var updating_lottery_number = true, update_interval = 1000/24;
-var interface_list = ["main_interface", "settings_interface", "copyright_interface"]
+var interface_list = ["main_interface", "settings_interface", "copyright_interface"];
 
 /* ====== Interface switch ====== */
 
@@ -95,12 +101,12 @@ function random_range_list(min_number, max_number, n, exclude_list)
 
 function draw_current_lottery_numbers()
 {
-	var result = ""
+	var result = "";
 	for (var i = 0; i < current_lottery_numbers.length; i++)
 	{
 		var current_number = current_lottery_numbers[i];
 		var button = "<button class=\"normal circle\" onclick='add_to_history("+ i +")'>+</button>";
-		var current_line = "<p><span>"+current_number+ "</span>" + button + "</p>";
+		var current_line = "<p><span>"+ mapping[current_number]+ "</span>" + button + "</p>";
 		result = result + current_line;
 	}
 
@@ -108,11 +114,11 @@ function draw_current_lottery_numbers()
 	{
 		if (updating_lottery_number)
 		{
-			result = "<div>Please enter number of lottery numbers</div>";
+			result = "<div>请设置抽取数量</div>";
 			updating_lottery_number = false;
 		}
 		else
-			result = "<div>Press Start</div>"
+			result = "<div>请点击“开始”</div>"
 	}
 	document.getElementById("lottery_number_div").innerHTML = result;
 }
@@ -122,10 +128,13 @@ function update_lottery_number()
 	if (!updating_lottery_number)
 		return;
 
+	var min_lottery_number = 0;
+	var max_lottery_number = mapping.length;
+
 	if (min_lottery_number + number_of_lottery_numbers +
 			history_lottery_numbers.length > max_lottery_number)
 	{
-		alert("range not sufficient");
+		alert("抽取数量不能大于名单长度。请重新设置抽取数量。");
 		number_of_lottery_numbers = max_lottery_number - min_lottery_number -
 			history_lottery_numbers.length;
 	}
@@ -142,13 +151,13 @@ function draw_history()
 	{
 		var delete_code = "onclick='delete_history("+ i +")'";
 		var button = "<button class=\"danger circle\"" + delete_code + ">-</button>";
-		var line = "<p><span>" + history_lottery_numbers[i] +
+		var line = "<p><span>" + mapping[history_lottery_numbers[i]] +
 			"</span>" + button + "</p>";
 		result += line;
 	}
 
 	if (history_lottery_numbers.length == 0)
-		result = "<div>History is empty</div>";
+		result = "<div>暂无历史记录</div>";
 
 	document.getElementById("history_div").innerHTML = result;
 }
@@ -183,7 +192,7 @@ function on_stop_button()
 
 function on_clear_button(force_clear = false)
 {
-	if (force_clear || confirm("Clear current numbers?"))
+	if (force_clear || confirm("确认要清空当前内容？"))
 	{
 		on_stop_button();
 		current_lottery_numbers = [];
@@ -200,7 +209,7 @@ function on_save_history_button()
 
 function on_clear_history_button()
 {
-	if (confirm("Clear history?"))
+	if (confirm("确认要清空历史记录？"))
 	{
 		history_lottery_numbers = [];
 		draw_history();
@@ -211,18 +220,14 @@ function on_clear_history_button()
 
 function show_settings_values()
 {
-	document.getElementById("input_min_number").value = min_lottery_number.toString();
-	document.getElementById("input_max_number").value = max_lottery_number.toString() - 1;
 	document.getElementById("input_number_of_lotteries").value = number_of_lottery_numbers.toString();
+	document.getElementById("input_list").value = mapping.join("\n");
 }
 
 function on_save_button()
 {
-	min_lottery_number = parseInt(document.getElementById("input_min_number").value);
-	max_lottery_number = 1 + parseInt(document.getElementById("input_max_number").value);
+	mapping = document.getElementById("input_list").value.split("\n");
 	number_of_lottery_numbers = parseInt(document.getElementById("input_number_of_lotteries").value);
-
-	max_lottery_number = Math.max(max_lottery_number, min_lottery_number+number_of_lottery_numbers);
 
 	if (number_of_lottery_numbers < 0)
 		number_of_lottery_numbers = 0;
@@ -233,7 +238,7 @@ function on_save_button()
 
 function show_prompt()
 {
-	document.getElementById("prompt_measure").innerHTML = "<p>Settings Saved</p>";
+	document.getElementById("prompt_measure").innerHTML = "<p>已保存</p>";
 	adjust_height_for("prompt");
 	setTimeout("hide_prompt()", prompt_timeout);
 }
